@@ -13,9 +13,11 @@
 %right TOK_POW
 %right TOK_NOT
 %token INT_LITERAL FLOAT_LITERAL BOOL_LITERAL TOK_OPEN_BRACKET TOK_CLOSE_BRACKET
-%token IDENTIFIER STRING_LITERAL CHAR_LITERAL
+%token IDENTIFIER STRING_LITERAL CHAR_LITERAL ERROR
 %%
-expression: IDENTIFIER 
+expression: IDENTIFIER {
+	// to be continued...
+}
 expression : literal
 expression: TOK_OPEN_BRACKET expression TOK_CLOSE_BRACKET
 expression: expression TOK_PLUS expression

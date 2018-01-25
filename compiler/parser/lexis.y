@@ -1,6 +1,7 @@
 %{
 #include <stdlib.h>
 #include "grammar.tab.hpp"
+int currentLine = 1;
 %}
 %option noyywrap
 %%
@@ -20,3 +21,5 @@ not				return TOK_NOT;
 \"([^"]|(\\\"))*\"		return STRING_LITERAL;
 ('.')|('\\'')			return CHAR_LITERAL;
 [ \t]				;
+\n				++currentLine;
+.				return ERROR;
