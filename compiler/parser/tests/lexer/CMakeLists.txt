@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.10)
+project(lexerTest)
+set(SOURCE_FILES main.cpp)
+add_subdirectory(googletest/)
+include_directories(googletest/include)
+target_link_libraries(lexerTest gtest)
+add_executable(main ${SOURCE_FILES})

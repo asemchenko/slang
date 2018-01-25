@@ -1,6 +1,32 @@
 %{
-
+#include <cmath>
 %}
-
-
+%define api.value.type {struct YYSTYPE {
+	int intV;
+	double doubleV;
+	char *strV;
+	char charV;
+	unsigned char boolV; // unsigned char used without bool for c-compability
+}}
+%left TOK_PLUS TOK_MINUS
+%left TOK_MULTIPLY TOK_DIVIDE TOK_MODULO
+%right TOK_POW
+%right TOK_NOT
+%token INT_LITERAL FLOAT_LITERAL BOOL_LITERAL TOK_OPEN_BRACKET TOK_CLOSE_BRACKET
+%token IDENTIFIER STRING_LITERAL CHAR_LITERAL
 %%
+expression: IDENTIFIER 
+expression : literal
+expression: TOK_OPEN_BRACKET expression TOK_CLOSE_BRACKET
+expression: expression TOK_PLUS expression
+expression: expression TOK_MINUS expression
+expression: expression TOK_MULTIPLY expression
+expression: expression TOK_DIVIDE expression
+expression: expression TOK_MODULO expression
+expression: TOK_NOT expression
+
+literal: INT_LITERAL
+literal: FLOAT_LITERAL
+literal: BOOL_LITERAL
+literal: STRING_LITERAL
+literal: CHAR_LITERAL
