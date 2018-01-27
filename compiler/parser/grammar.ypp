@@ -1,10 +1,20 @@
 %{
 #include <cmath>
+#include <cstdio>
+#include <string>
+using std::string;
+int yylex(void);
+extern FILE *parserOut;
+extern int currentLine;
+void yyerror(const char *msg) {
+	fprintf(stderr, "\x1b[31m[ BISON ERROR] %s in line #%d\n\x1b[0m",msg, currentLine);
+}
 %}
+%debug
 %define api.value.type {struct YYSTYPE {
 	int intV;
 	double doubleV;
-	char *strV;
+	string strV;
 	char charV;
 	unsigned char boolV; // unsigned char used without bool for c-compability
 }}
@@ -13,20 +23,77 @@
 %right TOK_POW
 %right TOK_NOT
 %token INT_LITERAL FLOAT_LITERAL BOOL_LITERAL TOK_OPEN_BRACKET TOK_CLOSE_BRACKET
-%token IDENTIFIER STRING_LITERAL CHAR_LITERAL ERROR
+%token IDENTIFIER STRING_LITERAL CHAR_LITERAL ERROR TOK_OPEN_BRACE TOK_CLOSE_BRACE TOK_SEMICOLON
+%token TOK_IF TOK_ELSE TOK_COLON TOK_WHILE TOK_FOR
+%start input
 %%
-expression: IDENTIFIER {
-	// to be continued...
+input: operators {
+	fprintf(parserOut, "[ RESULT ] %s\n", $<strV>1.c_str());
 }
-expression : literal
+input: ERROR {fprintf(stderr, "\x1b[31m[ LEXER ERROR ] unrecognized token in line #%d \n\x1b[0m",currentLine ); exit(0);}
+operators: operators operator {
+	$<strV>$ = $<strV>1 + " " +$<strV>2;
+}
+operators: operator {
+	$<strV>$ = $<strV>1;
+}
+operator: expression TOK_SEMICOLON {
+	$<strV>$ = $<strV>1 + ";";
+}
+operator: if_statement {$<strV>$ = $<strV>1;} | while_loop {$<strV>$ = $<strV>1;} | for_loop {$<strV>$ = $<strV>1;}
+operator: TOK_OPEN_BRACE operators TOK_CLOSE_BRACE {$<strV>$ = "(" + $<strV>2 + ")";}
+expression: IDENTIFIER {
+	$<strV>$ = $<strV>1;
+	fprintf(parserOut,"Identifier: %s\n", $<strV>1.c_str());
+}
+expression : literal {
+	$<strV>$ = $<strV>1;
+	fprintf(parserOut,"PushLiteral: %s\n", $<strV>1.c_str());
+}
 expression: TOK_OPEN_BRACKET expression TOK_CLOSE_BRACKET
-expression: expression TOK_PLUS expression
-expression: expression TOK_MINUS expression
-expression: expression TOK_MULTIPLY expression
-expression: expression TOK_DIVIDE expression
-expression: expression TOK_MODULO expression
-expression: TOK_NOT expression
-
+expression: expression TOK_PLUS expression {
+	$<strV>$ = $<strV>1 + " + " + $<strV>3;
+	fprintf(parserOut, "[ INSTRUCTION ] binary add\n");
+}
+expression: expression TOK_MINUS expression {
+	$<strV>$ = $<strV>1 + " - " + $<strV>3;
+	fprintf(parserOut, "[ INSTRUCTION ] binary substraction\n");
+}
+expression: expression TOK_MULTIPLY expression {
+	$<strV>$ = $<strV>1 + " * " + $<strV>3;
+	fprintf(parserOut, "[ INSTRUCTION ] binary multiplication\n");
+}
+expression: expression TOK_DIVIDE expression {
+	$<strV>$ = $<strV>1 + " / " + $<strV>3;
+	fprintf(parserOut, "[ INSTRUCTION ] binary division\n");
+}
+expression: expression TOK_MODULO expression {
+	$<strV>$ = $<strV>1 + " % " + $<strV>3;
+	fprintf(parserOut, "[ INSTRUCTION ] modulo division\n");
+}
+expression: TOK_NOT expression {
+	$<strV>$ = " not " + $<strV>2;
+	fprintf(parserOut, "[ INSTRUCTION ] logical invertion\n");
+}
+expression: expression TOK_POW expression {
+	$<strV>$ = $<strV>1 + " + " + $<strV>3;
+	fprintf(parserOut, "[ INSTRUCTION ] exponentiation\n");
+}
+if_statement: TOK_IF expression operator {
+	$<strV>$ = "if(" + $<strV>2 + ") { " + $<strV>3 + "} ";
+	fprintf(parserOut, "[ IF WITHOUT ELSE ] expression: %s\n",$<strV>2.c_str());
+}
+if_statement: TOK_IF expression operator TOK_ELSE operator {
+	$<strV>$ = "if(" + $<strV>2 + ") { " + $<strV>3 + "} else { " + $<strV>5 + " }";
+	fprintf(parserOut, "[ IF/ELSE ] expression: %s\n",$<strV>2.c_str());
+}
+while_loop: TOK_WHILE expression operator {
+	$<strV>$ = "while(" + $<strV>2 + ") { " + $<strV>3 + " }";
+	fprintf(parserOut, "[ WHILE LOOP ] expression: %s\n",$<strV>2.c_str());
+}
+for_loop: TOK_FOR TOK_OPEN_BRACKET expression TOK_SEMICOLON expression TOK_SEMICOLON expression TOK_SEMICOLON TOK_CLOSE_BRACKET operator{
+	$<strV>$ = "for(" + $<strV>3 + ";"+ $<strV>5 + ";"+ $<strV>7 + "; { " + $<strV>10 + " }";
+}
 literal: INT_LITERAL
 literal: FLOAT_LITERAL
 literal: BOOL_LITERAL

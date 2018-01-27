@@ -1,0 +1,10 @@
+Identifier: a
+Identifier: a
+Identifier: c
+Identifier: d
+Identifier: e
+[ IF/ELSE ] expression: c
+[ WHILE LOOP ] expression: a
+Identifier: g
+[ IF/ELSE ] expression: a
+[ RESULT ] if(a) { while(a) { if(c) { d;} else { e; } }} else { g; }
