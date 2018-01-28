@@ -3,7 +3,10 @@
 #include <string>
 using std::string;
 #include "grammar.tab.hpp"
+extern YYLTYPE yylloc;
+void BeginToken(const char *);
 int currentLine = 1;
+int currentColumn = 0;
 %}
 %option noyywrap
 %%
@@ -27,7 +30,18 @@ while				return TOK_WHILE;
 for 				return TOK_FOR;
 [a-zA-Z]+[0-9]*			{yylval.strV = string(yytext); return IDENTIFIER; }
 \"([^"]|(\\\"))*\"		return STRING_LITERAL;
-('.')|('\\'')			return CHAR_LITERAL;
-[ \t]				;
-\n				++currentLine;
+('.')|('\\'')			{ BeginToken(yytext); return CHAR_LITERAL; }
+\n				{ ++currentLine; currentColumn = 0; }
+[ \t]				{ ++currentColumn; }
 .				return ERROR;
+%%
+void BeginToken(const char * token) {
+	// actions for bison location tracking
+	yylloc.first_line = currentLine;
+	yylloc.first_column = currentColumn;
+	yylloc.last_line = currentLine;
+	currentColumn += strlen(token);
+	yylloc.last_column = currentColumn;
+	// actions for bison semantic value tracking
+	yylval.strV = string(token);
+}

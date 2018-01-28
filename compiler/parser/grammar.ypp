@@ -10,6 +10,7 @@ void yyerror(const char *msg) {
 	fprintf(stderr, "\x1b[31m[ BISON ERROR] %s in line #%d\n\x1b[0m",msg, currentLine);
 }
 %}
+%locations
 %debug
 %define api.value.type {struct YYSTYPE {
 	int intV;

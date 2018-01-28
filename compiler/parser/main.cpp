@@ -1,6 +1,6 @@
 #include <string>
 using std::string;
-#include "grammar.tab.hpp"
+int yyparse(void);
 #include <cstdio>
 extern int yydebug;
 FILE *parserOut;
