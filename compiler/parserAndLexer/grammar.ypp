@@ -19,19 +19,22 @@ void yyerror(const char *msg) {
 	char charV;
 	unsigned char boolV; // unsigned char used without bool for c-compability
 }}
+%right TOK_ASSIGN
+%left TOK_EQ TOK_NEQ
+%left TOK_GR TOK_GRE TOK_LE TOK_LEE
 %left TOK_PLUS TOK_MINUS
 %left TOK_MULTIPLY TOK_DIVIDE TOK_MODULO
 %right TOK_POW
 %right TOK_NOT
 %token INT_LITERAL FLOAT_LITERAL BOOL_LITERAL TOK_OPEN_BRACKET TOK_CLOSE_BRACKET
-%token IDENTIFIER STRING_LITERAL CHAR_LITERAL ERROR TOK_OPEN_BRACE TOK_CLOSE_BRACE TOK_SEMICOLON
-%token TOK_IF TOK_ELSE TOK_COLON TOK_WHILE TOK_FOR
+%token IDENTIFIER STRING_LITERAL CHAR_LITERAL TOK_OPEN_BRACE TOK_CLOSE_BRACE TOK_SEMICOLON
+%token TOK_IF TOK_ELSE TOK_COLON TOK_WHILE TOK_FOR TOK_FUNC TOK_RETURN TOK_COMMA
 %start input
 %%
 input: operators {
 	fprintf(parserOut, "[ RESULT ] %s\n", $<strV>1.c_str());
 }
-input: ERROR {fprintf(stderr, "\x1b[31m[ LEXER ERROR ] unrecognized token in line #%d \n\x1b[0m",currentLine ); exit(0);}
+input: func_definition operators
 operators: operators operator {
 	$<strV>$ = $<strV>1 + " " +$<strV>2;
 }
@@ -41,8 +44,11 @@ operators: operator {
 operator: expression TOK_SEMICOLON {
 	$<strV>$ = $<strV>1 + ";";
 }
+operator: TOK_RETURN expression TOK_SEMICOLON {
+	$<strV>$ = "return " + $<strV>2;
+}
 operator: if_statement {$<strV>$ = $<strV>1;} | while_loop {$<strV>$ = $<strV>1;} | for_loop {$<strV>$ = $<strV>1;}
-operator: TOK_OPEN_BRACE operators TOK_CLOSE_BRACE {$<strV>$ = "(" + $<strV>2 + ")";}
+operator: TOK_OPEN_BRACE operators TOK_CLOSE_BRACE {$<strV>$ = "{" + $<strV>2 + "}";}
 expression: IDENTIFIER {
 	$<strV>$ = $<strV>1;
 	fprintf(parserOut,"Identifier: %s\n", $<strV>1.c_str());
@@ -51,7 +57,9 @@ expression : literal {
 	$<strV>$ = $<strV>1;
 	fprintf(parserOut,"PushLiteral: %s\n", $<strV>1.c_str());
 }
-expression: TOK_OPEN_BRACKET expression TOK_CLOSE_BRACKET
+expression: TOK_OPEN_BRACKET expression TOK_CLOSE_BRACKET {
+	$<strV>$ = $<strV>2;
+}
 expression: expression TOK_PLUS expression {
 	$<strV>$ = $<strV>1 + " + " + $<strV>3;
 	fprintf(parserOut, "[ INSTRUCTION ] binary add\n");
@@ -80,6 +88,28 @@ expression: expression TOK_POW expression {
 	$<strV>$ = $<strV>1 + " + " + $<strV>3;
 	fprintf(parserOut, "[ INSTRUCTION ] exponentiation\n");
 }
+expression: func_call
+expression: IDENTIFIER TOK_ASSIGN expression {
+	// implementation required
+}
+expression: expression TOK_EQ expression {
+	// implementation required
+}
+expression: expression TOK_NEQ expression {
+	// implementation required
+}
+expression: expression TOK_GR expression {
+	// implementation required
+}
+expression: expression TOK_GRE expression {
+	// implementation required
+}
+expression: expression TOK_LE expression {
+	// implementation required
+}
+expression: expression TOK_LEE expression {
+	// implementation required
+}
 if_statement: TOK_IF expression operator {
 	$<strV>$ = "if(" + $<strV>2 + ") { " + $<strV>3 + "} ";
 	fprintf(parserOut, "[ IF WITHOUT ELSE ] expression: %s\n",$<strV>2.c_str());
@@ -95,6 +125,17 @@ while_loop: TOK_WHILE expression operator {
 for_loop: TOK_FOR TOK_OPEN_BRACKET expression TOK_SEMICOLON expression TOK_SEMICOLON expression TOK_SEMICOLON TOK_CLOSE_BRACKET operator{
 	$<strV>$ = "for(" + $<strV>3 + ";"+ $<strV>5 + ";"+ $<strV>7 + "; { " + $<strV>10 + " }";
 }
+func_definition: TOK_FUNC IDENTIFIER TOK_OPEN_BRACKET parameters_list_definition TOK_CLOSE_BRACKET operator {
+	// implementation required
+}
+parameters_list_definition: 
+	|
+	IDENTIFIER
+	|
+	parameters_list_definition TOK_COMMA IDENTIFIER
+	;
+func_call: IDENTIFIER TOK_OPEN_BRACKET actual_arguments_list TOK_CLOSE_BRACKET
+actual_arguments_list: | expression | actual_arguments_list TOK_COMMA expression
 literal: INT_LITERAL
 literal: FLOAT_LITERAL
 literal: BOOL_LITERAL

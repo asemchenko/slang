@@ -1,0 +1,17 @@
+PushLiteral: 0
+Identifier: b
+Identifier: a
+Identifier: b
+Identifier: a
+Identifier: b
+[ INSTRUCTION ] modulo division
+[ IF/ELSE ] expression: 0
+Identifier: i
+Identifier: i
+Identifier: f
+Identifier: c
+[ IF/ELSE ] expression: i
+Identifier: g
+Identifier: e
+[ WHILE LOOP ] expression: g
+[ WHILE LOOP ] expression: i

@@ -1,1 +1,0 @@
-354354 -3138 1535.322548 6545. true false +-*/%^not() varName othervar VAR"this is string literal+355 0.5564 ^^^ /*-+" additionalVar 'c'^ not otherVar " this is string constant which contains some surprise \""^ '\'' varName

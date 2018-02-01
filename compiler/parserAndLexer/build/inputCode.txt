@@ -1,0 +1,9 @@
+func gcd(a,b) if(0 == b) return a; else return gcd(b,a%b);
+while(i) { 
+	if i 
+		f; 
+	else 
+		c; 
+	while(g) 
+		e; 
+}
