@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string>
 using std::string;
+#include "astClasses.hpp"
 #include "grammar.tab.hpp"
 extern YYLTYPE yylloc;
 void BeginToken(const char *);

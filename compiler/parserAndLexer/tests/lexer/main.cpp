@@ -2,6 +2,8 @@
 #include <cstdio>
 #include <cstdlib>
 using std::string;
+#include "astClasses.hpp"
+using namespace slang_AST_NODES;
 #include "grammar.tab.hpp"
 YYLTYPE yylloc;
 extern FILE *yyin;
