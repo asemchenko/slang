@@ -1,13 +1,14 @@
 #include <string>
 #include <string.h>
+#include <cstdio>
+#include "astClasses.hpp"
+extern slang_AST_NODES::Operators *programm;
 using std::string;
 int yyparse(void);
-#include <cstdio>
 extern int yydebug;
 FILE *parserOut;
 extern FILE *yyin;
 int main(int argc, char** argv) {
-//	yydebug = 1;
 	if(argc > 1) {
 		fprintf(stderr, "Opening file %s...\n", argv[1]);
 		yyin = fopen(argv[1], "r");
@@ -25,6 +26,7 @@ int main(int argc, char** argv) {
 	}
 	parserOut = fopen("parserOutput.txt", "w");
 	yyparse();
+	programm->print(parserOut,0);
 	fclose(parserOut);
 	return 0;
 }

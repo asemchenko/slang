@@ -47,7 +47,7 @@ input: operators {
 	programm = $<opers>1;
 }
 input: func_definition operators {
-	programm = $<opers>1;
+	programm = $<opers>2;
 }
 operators: operators operator {
 	$<opers>1->push_back($<oper>2);
@@ -172,8 +172,19 @@ actual_arguments_list: actual_arguments_list TOK_COMMA expression[expr] {
 	$$ = $1;
 	$$.push_back($<expr>expr);
 }
-literal: INT_LITERAL
-literal: FLOAT_LITERAL
-literal: BOOL_LITERAL
-literal: STRING_LITERAL
-literal: CHAR_LITERAL
+%type <expr> literal;
+literal: INT_LITERAL {
+	$$ = new Literal($<intV>1);
+}
+literal: FLOAT_LITERAL {
+	$$ = new Literal($<doubleV>1);
+}
+literal: BOOL_LITERAL {
+	$$ = new Literal($<boolV>1);
+}
+literal: STRING_LITERAL {
+	$$ = new Literal($<strV>1);
+}
+literal: CHAR_LITERAL {
+	$$ = new Literal($<charV>1);
+}
