@@ -4,23 +4,25 @@
 #include <string>
 #include <map>
 #include "astClasses.hpp"
+#include "grammar.tab.hpp"
 using namespace slang_AST_NODES;
 using std::string;
 Operators *programm;
 std::map<string,Function*> declaredFunctions;
-int yylex(void);
+int yylex(YYSTYPE*, YYLTYPE *);
 extern FILE *parserOut;
-extern int currentLine;
-void yyerror(const char *msg) {
-	fprintf(stderr, "\x1b[31m[ BISON ERROR] %s in line #%d\n\x1b[0m",msg, currentLine);
+extern std::string inputFilename;
+void yyerror(YYLTYPE *locp, const char *msg) {
+	fprintf(stderr, "\x1b[31m[ BISON ERROR] %s at \x1b[1;4;31m%s:%d:%d\n\x1b[0m",msg, inputFilename.c_str(),locp->first_line, locp->first_column);
 }
 %}
 %locations
 %debug
+%define api.pure full
 %define api.value.type {struct YYSTYPE {
 	int intV;
 	double doubleV;
-	string strV;
+	std::string strV;
 	char charV;
 	unsigned char boolV; // unsigned char used without bool for c-compability
 	slang_AST_NODES::Operator *oper;

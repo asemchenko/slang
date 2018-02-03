@@ -5,6 +5,7 @@
 extern slang_AST_NODES::Operators *programm;
 using std::string;
 int yyparse(void);
+std::string inputFilename;
 extern int yydebug;
 FILE *parserOut;
 extern FILE *yyin;
@@ -12,6 +13,7 @@ int main(int argc, char** argv) {
 	if(argc > 1) {
 		fprintf(stderr, "Opening file %s...\n", argv[1]);
 		yyin = fopen(argv[1], "r");
+		inputFilename = argv[1];
 		if(!yyin) {
 			fprintf(stderr, "\x1b[31m[ ERROR ] Can not open file %s for reading\x1b[0m\n", argv[1]);
 			return 0;
@@ -25,8 +27,9 @@ int main(int argc, char** argv) {
 		}
 	}
 	parserOut = fopen("parserOutput.txt", "w");
-	yyparse();
-	programm->print(parserOut,0);
+	if(!yyparse()) {
+		programm->print(parserOut,0);
+	}
 	fclose(parserOut);
 	return 0;
 }
