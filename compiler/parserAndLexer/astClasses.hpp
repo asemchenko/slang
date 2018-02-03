@@ -6,7 +6,12 @@
 namespace slang_AST_NODES {
 	class Operator {
 		public:
-			virtual ~Operator() {}
+			Operator() = default;
+			Operator(const Operator&) = delete;
+			Operator(Operator&&) = delete;
+			void operator = (const Operator&) = delete;
+			void operator = (Operator&&) = delete;
+			virtual ~Operator() = default;
 			virtual void print(FILE *stream, int indentLevel) = 0;
 			void printIndent(int level, FILE *stream) {
 				while(level--) fprintf(stream, "\t");
@@ -14,7 +19,12 @@ namespace slang_AST_NODES {
 	};
 	class Expression {
 		public:
-			virtual ~Expression() {}
+			Expression() = default;
+			Expression(const Expression&) = delete;
+			Expression(Expression&&) = delete;
+			void operator = (const Expression&) = delete;
+			void operator = (Expression&&) = delete;
+			virtual ~Expression() = default;
 			virtual void print(FILE *stream) = 0;
 	};
 	class Operators: public Operator {
@@ -29,6 +39,9 @@ namespace slang_AST_NODES {
 					fprintf(stream, "\n");
 				}
 			}
+			~Operators() override {
+				for(auto op: operators) delete op;
+			}
 	};
 	class OpExpression: public Operator {
 		public:
@@ -37,6 +50,9 @@ namespace slang_AST_NODES {
 				printIndent(indentLevel, stream);
 				expr->print(stream);
 				fprintf(stream, ";\n");
+			}
+			~OpExpression() override {
+				delete expr;
 			}
 		private:
 			Expression *expr;
@@ -49,12 +65,16 @@ namespace slang_AST_NODES {
 				expr->print(stream);
 				fprintf(stream, "\n");
 			}
+			~OpReturn() override {
+				delete expr;
+			}
 		private:
 			Expression *expr;
 	};
 	class OpIF: public Operator {
 		public:
 			OpIF(Expression *cond,Operator *ifOp_, Operator *elseOp_): condition(cond), ifOp(ifOp_), elseOp(elseOp_) {}
+			OpIF(Expression *cond,Operator *ifOp_): condition(cond), ifOp(ifOp_), elseOp(nullptr) {}
 			void print(FILE *stream, int indentLevel) {
 				printIndent(indentLevel, stream);
 				fprintf(stream, "if("); condition->print(stream); fprintf(stream, ") {\n");
@@ -69,6 +89,11 @@ namespace slang_AST_NODES {
 					fprintf(stream, "}\n");
 				}
 			}
+			~OpIF() override {
+				delete condition;
+				delete ifOp;
+				delete elseOp;
+			}
 		private:
 			Expression *condition;
 			Operator *ifOp;
@@ -81,8 +106,7 @@ namespace slang_AST_NODES {
 				fprintf(stream, "%s", value.c_str());
 			}
 		private:
-			std::string value;
-			
+			std::string value;	
 	};
 	class Literal: public Expression {
 		private:
@@ -117,13 +141,9 @@ namespace slang_AST_NODES {
 				type = CHAR;
 				value.charV = val;
 			}
-			~Literal() {
+			~Literal() override {
 				if(STRING == type) delete value.stringV;
 			}
-			Literal(const Literal&) = delete;
-			Literal(const Literal&&) = delete;
-			Literal& operator = (const Literal&) = delete;
-			Literal& operator = (const Literal&&) = delete;
 			void print(FILE *stream) override {
 				fprintf(stream, "EXPRESSION");
 			}
@@ -136,6 +156,10 @@ namespace slang_AST_NODES {
 				firstOperand->print(stream);
 				fprintf(stream, " OP ");
 				secondOperand->print(stream);
+			}
+			~BinaryOperation() override {
+				delete firstOperand;
+				delete secondOperand;
 			}
 		private:
 			Expression *firstOperand;
@@ -159,6 +183,9 @@ namespace slang_AST_NODES {
 				}
 				fprintf(stream, ")");
 			}
+			~FunctionCall() override {
+				for(auto e: arguments) delete e;
+			}
 	};
 	class WhileLoop: public Operator {
 		private:
@@ -173,9 +200,14 @@ namespace slang_AST_NODES {
 				printIndent(indentLevel, stream);
 				fprintf(stream, "}\n");
 			}
+			~WhileLoop() override {
+				delete condition;
+				delete body;
+			}
 	};
 	class ForLoop: public Operator {
 		private:
+			// refactoring required - members name below should be substituted
 			Expression *firstExpression;
 			Expression *secondExpression;
 			Expression *thirdExpression;
@@ -192,6 +224,12 @@ namespace slang_AST_NODES {
 				printIndent(indentLevel, stream);
 				fprintf(stream, "}\n");
 			}
+			~ForLoop() override {
+				delete firstExpression;
+				delete secondExpression;
+				delete thirdExpression;
+				delete body;
+			}
 	};
 	class Function {
 		private:
@@ -200,7 +238,10 @@ namespace slang_AST_NODES {
 			Operator *body;
 		public:
 			Function(std::string name_, std::vector<Identifier*> parametersName_, Operator *body_): name(name_), parametersName(parametersName_), body(body_) {}
-			virtual ~Function() {}
+			virtual ~Function() { 
+				for(auto e: parametersName) delete e;
+				delete body;
+			}
 	};
 }
 #endif
