@@ -1,6 +1,0 @@
-<map id="slang_AST_NODES::Expression" name="slang_AST_NODES::Expression">
-<area shape="rect" id="node2" href="$classslang__AST__NODES_1_1BinaryOperation.html" title="slang_AST_NODES::BinaryOperation" alt="" coords="268,5,511,32"/>
-<area shape="rect" id="node3" href="$classslang__AST__NODES_1_1FunctionCall.html" title="slang_AST_NODES::FunctionCall" alt="" coords="278,56,501,83"/>
-<area shape="rect" id="node4" href="$classslang__AST__NODES_1_1Identifier.html" title="slang_AST_NODES::Identifier" alt="" coords="290,107,489,133"/>
-<area shape="rect" id="node5" href="$classslang__AST__NODES_1_1Literal.html" title="slang_AST_NODES::Literal" alt="" coords="297,157,481,184"/>
-</map>
