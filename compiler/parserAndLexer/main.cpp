@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
 	parserOut = fopen("parserOutput.txt", "w");
 	if(!yyparse()) {
 		programm->print(parserOut,0);
+		delete programm;
 	}
 	fclose(parserOut);
 	return 0;

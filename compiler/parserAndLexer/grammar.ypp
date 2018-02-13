@@ -48,7 +48,8 @@ void yyerror(YYLTYPE *locp, const char *msg) {
 input: operators {
 	programm = $<opers>1;
 }
-input: func_definition operators {
+func_definitions: func_definition | func_definitions func_definition
+input: func_definitions operators {
 	programm = $<opers>2;
 }
 operators: operators operator {

@@ -1,2 +1,14 @@
-func gcd(a,b) if(0 == b) return a; else return gcd(b,a%b);
+func gcd(a,b) 
+	if(0 == b) 
+		return a; 
+	else 
+		return gcd(b,a%b);
+
+func lcm(a,b) {
+	while(0 != b){
+		b = a%b;
+		a = b;
+	}
+	return a;
+}
 while i { if i f; else c; while(g) e; }
